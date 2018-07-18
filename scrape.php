@@ -124,26 +124,31 @@ include("crawler/simple_html_dom.php");
 
                 $titles = [];
                 $titlesUrl = [];
-                $descriptions = [];
-                $urls = [];
+                $date = [];
+                $description = [];
+                $images = [];
                 $otherLinks = [];
                 $mp3Links = [];
 
 
                 foreach ($html->find('h2[class=post-box-title]') as $element):
-                    $titles[] = $element . '<br/>';
+                    $titles[] = $element->plaintext . '<br/>';
+                endforeach;
+
+                foreach ($html->find('.entry p') as $element):
+                    $description[] = $element->plaintext . '<br/>';
                 endforeach;
 
                 foreach ($html->find('h2[class=post-box-title] a') as $element):
-                    $titlesUrl[] = $element. '<br/>';
+                    $titlesUrl[] = $element . '<br/>';
                 endforeach;
 
                 foreach ($html->find('span[class=tie-date]') as $element):
-                    $descriptions[] = $element . '<br/>';
+                    $date[] = $element . '<br/>';
                 endforeach;
 
                 foreach ($html->find('div[class=post-thumbnail]') as $element):
-                    $urls[] = $element. '<br/>';
+                    $images[] = $element. '<br/>';
                 endforeach;
 
 //        for ($i = 0; $i < count($titles); $i++):
@@ -153,17 +158,16 @@ include("crawler/simple_html_dom.php");
 //                endfor;
 
 
-                for ($i = 0; $i < count($titles); $i++):
-                    $href = str_get_html($titles[$i]);
+                for ($i = 0; $i < count($titlesUrl); $i++):
+                    $href = str_get_html($titlesUrl[$i]);
                     $mp3 = file_get_html(getDownloadLinks($href));
-                    foreach($mp3->find('div[class=zbPlayer]') as $mp3Links){
-                        print_r(getDownloadLinks($mp3Links)); die();
+
+                    echo 'Title:'.$titles[$i].'<br/> Description:'
+                      . $date[$i].'<br/> Image: '. $images[$i].'<br/> Description: '
+                    . $description[$i].'<br/>';
+                    foreach($mp3->find('a[class=zbPlayer-download]') as $mp3Links){
+                        echo 'Mp3Link: '.$mp3Links->href.'<hr/>';
                     }
-//                    foreach($mp3->find('a') as $links){
-//                        print_r($links->href);
-//                    }
-//                    echo '<span style="font-size: large; color:darkblue;" >'.$titles[$i].'</span>'. getDownloadLinks($href)
-//                        . $descriptions[$i] . $urls[$i];
                 endfor;
     function getDownloadLinks($link){
         //print_r($link);die();
